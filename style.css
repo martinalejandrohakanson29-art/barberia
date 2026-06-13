@@ -252,8 +252,8 @@ section { padding: clamp(5rem, 10vw, 9rem) 0; }
   display: none;
   flex-direction: column;
   gap: 5px;
-  padding: 4px;
-  margin-left: auto;
+  padding: 12px 10px; /* amplía el área táctil a ~44px sin mover el ícono (compensado con márgenes negativos) */
+  margin: -12px -8px -12px auto;
 }
 .nav__burger span {
   display: block;
@@ -358,13 +358,22 @@ section { padding: clamp(5rem, 10vw, 9rem) 0; }
 
 .hero__title {
   font-family: var(--ff-display);
-  font-size: clamp(5.5rem, 18vw, 14rem);
+  font-size: clamp(3.2rem, 14vw, 8.5rem);
   font-weight: 300;
   letter-spacing: .14em;
+  text-indent: .14em; /* compensa el espacio extra que letter-spacing deja a la derecha y recentra el texto */
   line-height: .88;
   color: var(--cream);
   text-shadow: 0 0 100px rgba(0,0,0,.4);
   animation: fadeUp 1.5s var(--ease-expo) 0s both;
+}
+
+.hero__logo {
+  display: block;
+  width: clamp(90px, 14vw, 150px);
+  height: auto;
+  margin: 1.75rem auto 0;
+  animation: fadeUp 1.5s var(--ease-expo) .2s both;
 }
 
 .hero__divider {
@@ -871,7 +880,7 @@ section { padding: clamp(5rem, 10vw, 9rem) 0; }
   border: 1px solid var(--border-sub);
   color: var(--cream);
   font-family: var(--ff-body);
-  font-size: .9rem;
+  font-size: 1rem; /* 16px evita el zoom automático de iOS al enfocar el campo */
   font-weight: 300;
   padding: .85rem 1rem;
   outline: none;
@@ -1022,7 +1031,6 @@ a.footer__contact-item:hover { color: var(--gold); }
 @media (max-width: 640px) {
   :root { --nav-h: 60px; }
 
-  .hero__title { font-size: clamp(4rem, 20vw, 6.5rem); }
   .hero__badge { display: none; }
 
   .schedule__grid { grid-template-columns: 1fr 1fr; }
