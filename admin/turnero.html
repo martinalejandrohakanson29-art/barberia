@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arcanus · Turnero</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div class="shell">
+    <!-- Sidebar -->
+    <aside class="side" id="side">
+      <div class="side__brand">
+        <div class="side__logo">ARCANUS</div>
+        <div class="side__tag">Gestión</div>
+      </div>
+      <nav class="side__nav">
+        <a class="side__link" data-nav="turnero" href="turnero.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Turnero
+        </a>
+        <a class="side__link" data-nav="profesionales" href="profesionales.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Profesionales
+        </a>
+        <a class="side__link" data-nav="servicios" href="servicios.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          Servicios
+        </a>
+      </nav>
+      <div class="side__foot">
+        <div class="side__user">
+          <div class="side__avatar" id="side-avatar">A</div>
+          <div>
+            <div class="side__uname" id="side-uname">—</div>
+            <div class="side__urole" id="side-urole"></div>
+          </div>
+        </div>
+        <button class="btn btn--danger btn--full btn--sm" id="logout">Cerrar sesión</button>
+      </div>
+    </aside>
+    <div class="backdrop-side"></div>
+
+    <!-- Main -->
+    <div class="main">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:.6rem">
+          <button class="burger" id="burger" aria-label="Menú">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+          </button>
+          <h1 class="topbar__title">Turnero</h1>
+        </div>
+        <div class="topbar__actions">
+          <select class="select" id="filtro-barbero"><option value="all">Todos los barberos</option></select>
+          <div class="weeknav">
+            <button id="prev" aria-label="Semana anterior">‹</button>
+            <button id="today">Hoy</button>
+            <span class="weeknav__label" id="weeklabel">—</span>
+            <button id="next" aria-label="Semana siguiente">›</button>
+          </div>
+          <button class="btn btn--gold btn--sm" id="nuevo">+ Turno</button>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="legend">
+          <span><i style="background:var(--c-pend)"></i> Pendiente</span>
+          <span><i style="background:var(--c-conf)"></i> Confirmado</span>
+          <span><i style="background:var(--c-comp)"></i> Completado</span>
+          <span><i style="background:var(--c-canc)"></i> Cancelado</span>
+        </div>
+        <div class="agenda">
+          <div class="agenda__inner" id="agenda"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal detalle de turno -->
+  <div class="modal" id="modal-turno">
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__dialog">
+      <div class="modal__head">
+        <div class="modal__title" id="mt-nombre">—</div>
+        <div class="modal__meta" id="mt-cuando">—</div>
+      </div>
+      <div class="modal__body">
+        <div class="kv"><span>Servicio</span><strong id="mt-servicio">—</strong></div>
+        <div class="kv"><span>Barbero</span><strong id="mt-barbero">—</strong></div>
+        <div class="kv"><span>Duración</span><strong id="mt-duracion">—</strong></div>
+        <div class="kv"><span>Precio</span><strong id="mt-precio">—</strong></div>
+        <div class="kv"><span>Teléfono</span><strong id="mt-tel">—</strong></div>
+        <div class="kv"><span>Estado</span><strong id="mt-estado">—</strong></div>
+
+        <div class="modal__actions">
+          <button class="btn btn--ghost btn--sm" data-estado="confirmado">Confirmar</button>
+          <button class="btn btn--ghost btn--sm" data-estado="completado">Completar</button>
+          <button class="btn btn--ghost btn--sm" data-estado="cancelado">Cancelar turno</button>
+          <button class="btn btn--danger btn--sm" id="mt-eliminar">Eliminar</button>
+        </div>
+
+        <details>
+          <summary style="cursor:pointer;color:var(--gold);font-size:.8rem">Reprogramar</summary>
+          <div style="display:flex;gap:.5rem;margin-top:.6rem">
+            <input type="date" class="select" id="mt-fecha" style="flex:1">
+            <input type="time" class="select" id="mt-hora" step="900">
+            <button class="btn btn--gold btn--sm" id="mt-mover">Mover</button>
+          </div>
+        </details>
+      </div>
+      <div class="modal__foot">
+        <button class="btn btn--ghost btn--sm" data-close>Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal nuevo turno -->
+  <div class="modal" id="modal-nuevo">
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__dialog">
+      <div class="modal__head"><div class="modal__title">Nuevo turno</div></div>
+      <div class="modal__body">
+        <div class="field"><label>Barbero</label><select class="select" id="n-barbero"></select></div>
+        <div class="field"><label>Servicio</label><select class="select" id="n-servicio"></select></div>
+        <div class="field"><label>Fecha</label><input type="date" class="select" id="n-fecha"></div>
+        <div class="field"><label>Horarios libres</label><div class="booking__slots" id="n-slots" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:.4rem"></div></div>
+        <div class="field"><label>Nombre del cliente</label><input class="field-input select" id="n-nombre"></div>
+        <div class="field"><label>Teléfono</label><input class="field-input select" id="n-tel"></div>
+        <p class="msg-error" id="n-error" hidden></p>
+      </div>
+      <div class="modal__foot">
+        <button class="btn btn--ghost btn--sm" data-close>Cancelar</button>
+        <button class="btn btn--gold btn--sm" id="n-guardar">Guardar turno</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../config.js"></script>
+  <script src="app.js"></script>
+  <script src="turnero.js"></script>
+</body>
+</html>

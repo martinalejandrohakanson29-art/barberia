@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arcanus · Servicios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="side" id="side">
+      <div class="side__brand">
+        <div class="side__logo">ARCANUS</div>
+        <div class="side__tag">Gestión</div>
+      </div>
+      <nav class="side__nav">
+        <a class="side__link" data-nav="turnero" href="turnero.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Turnero
+        </a>
+        <a class="side__link" data-nav="profesionales" href="profesionales.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Profesionales
+        </a>
+        <a class="side__link" data-nav="servicios" href="servicios.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          Servicios
+        </a>
+      </nav>
+      <div class="side__foot">
+        <div class="side__user">
+          <div class="side__avatar" id="side-avatar">A</div>
+          <div>
+            <div class="side__uname" id="side-uname">—</div>
+            <div class="side__urole" id="side-urole"></div>
+          </div>
+        </div>
+        <button class="btn btn--danger btn--full btn--sm" id="logout">Cerrar sesión</button>
+      </div>
+    </aside>
+    <div class="backdrop-side"></div>
+
+    <div class="main">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:.6rem">
+          <button class="burger" id="burger" aria-label="Menú">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+          </button>
+          <h1 class="topbar__title">Servicios</h1>
+        </div>
+        <div class="topbar__actions">
+          <button class="btn btn--gold btn--sm" id="nuevo">+ Servicio</button>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="card table-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>Servicio</th><th>Nivel</th><th>Duración</th><th>Precio</th><th>Estado</th><th style="text-align:right">Acciones</th></tr>
+            </thead>
+            <tbody id="lista"><tr><td colspan="6" class="empty">Cargando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-servicio">
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__dialog">
+      <div class="modal__head"><div class="modal__title" id="ms-title">Nuevo servicio</div></div>
+      <div class="modal__body">
+        <div class="field"><label>Nombre</label><input class="select" id="ms-nombre"></div>
+        <div class="field"><label>Descripción</label><input class="select" id="ms-desc"></div>
+        <div class="field"><label>Nivel</label>
+          <select class="select" id="ms-nivel"><option value="premium">Premium</option><option value="estandar">Estándar</option></select>
+        </div>
+        <div class="field"><label>Duración (min)</label><input type="number" min="15" step="15" class="select" id="ms-dur"></div>
+        <div class="field"><label>Precio ($)</label><input type="number" min="0" step="500" class="select" id="ms-precio"></div>
+        <div class="field"><label>Activo</label>
+          <select class="select" id="ms-activo"><option value="true">Sí</option><option value="false">No</option></select>
+        </div>
+        <p class="msg-error" id="ms-error" hidden></p>
+      </div>
+      <div class="modal__foot">
+        <button class="btn btn--ghost btn--sm" data-close>Cancelar</button>
+        <button class="btn btn--gold btn--sm" id="ms-guardar">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../config.js"></script>
+  <script src="app.js"></script>
+  <script src="servicios.js"></script>
+</body>
+</html>

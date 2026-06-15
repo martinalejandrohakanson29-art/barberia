@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arcanus · Acceso panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div class="login">
+    <div class="login__card">
+      <div class="login__head">
+        <div class="login__logo">ARCANUS</div>
+        <div class="login__sub">Panel de gestión</div>
+      </div>
+      <form class="login__body" id="login-form">
+        <p class="msg-error" id="login-error" hidden></p>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required autocomplete="username">
+        </div>
+        <div class="field">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" name="password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn--gold btn--full" id="login-btn">Ingresar</button>
+        <p class="login__google">Login con Google · próximamente</p>
+      </form>
+    </div>
+  </div>
+
+  <script src="../config.js"></script>
+  <script src="app.js"></script>
+  <script>
+    // Si ya hay sesión válida, ir directo al turnero.
+    (async () => {
+      try {
+        const r = await fetch(`${API}/api/admin/me`, { credentials: "include" });
+        if (r.ok) location.href = "turnero.html";
+      } catch {}
+    })();
+
+    $("#login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const err = $("#login-error");
+      const btn = $("#login-btn");
+      err.hidden = true;
+      btn.disabled = true;
+      btn.textContent = "Ingresando...";
+      try {
+        const res = await fetch(`${API}/api/auth/sign-in/email`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: $("#email").value.trim(),
+            password: $("#password").value,
+          }),
+        });
+        if (!res.ok) throw new Error();
+        location.href = "turnero.html";
+      } catch {
+        err.textContent = "Email o contraseña incorrectos.";
+        err.hidden = false;
+        btn.disabled = false;
+        btn.textContent = "Ingresar";
+      }
+    });
+  </script>
+</body>
+</html>
