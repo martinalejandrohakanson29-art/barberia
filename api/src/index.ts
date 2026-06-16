@@ -73,6 +73,16 @@ const fmtAR = (date: Date) => {
 const solapan = (aIni: Date, aFin: Date, bIni: Date, bFin: Date) =>
   aIni < bFin && bIni < aFin;
 
+// Normaliza un celular argentino a 10 dígitos (característica + número),
+// tolerando +54 / 54 / 0 / 9. Devuelve null si no es válido.
+const normalizarTelAR = (raw: string): string | null => {
+  let d = (raw || "").replace(/\D/g, "");
+  if (d.startsWith("54")) d = d.slice(2);
+  if (d.length === 11 && d.startsWith("9")) d = d.slice(1);
+  if (d.startsWith("0")) d = d.slice(1);
+  return d.length === 10 ? d : null;
+};
+
 // ─────────────────────────────────────────────────────────────
 // Better Auth: delega todo /api/auth/* al handler de la librería.
 // ─────────────────────────────────────────────────────────────
@@ -234,6 +244,13 @@ app.post("/api/turnos", async (request, reply) => {
     return reply.status(400).send({ error: "Faltan datos de la reserva" });
   }
 
+  const telNormalizado = normalizarTelAR(telefono);
+  if (!telNormalizado) {
+    return reply
+      .status(400)
+      .send({ error: "El celular debe tener 10 dígitos (característica + número)" });
+  }
+
   const [barbero] = await db
     .select()
     .from(barberos)
@@ -283,7 +300,7 @@ app.post("/api/turnos", async (request, reply) => {
     .insert(turnos)
     .values({
       clienteNombre: nombre.trim(),
-      clienteTelefono: telefono.trim(),
+      clienteTelefono: telNormalizado,
       clienteEmail: email?.trim() || null,
       barberoId: Number(barberoId),
       servicioId: Number(servicioId),

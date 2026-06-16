@@ -491,8 +491,8 @@
             <label>Nombre y apellido
               <input type="text" name="nombre" required autocomplete="name">
             </label>
-            <label>Teléfono / WhatsApp
-              <input type="tel" name="telefono" required autocomplete="tel" placeholder="351 ...">
+            <label>Teléfono / WhatsApp <span>(10 dígitos con característica, sin 0 ni 15)</span>
+              <input type="tel" name="telefono" required autocomplete="tel" inputmode="numeric" maxlength="20" placeholder="Ej: 351 1234567">
             </label>
             <label>Email <span>(opcional)</span>
               <input type="email" name="email" autocomplete="email">

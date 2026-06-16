@@ -16,6 +16,17 @@
 
   const nivelLabel = { premium: "Premium", estandar: "Estándar" };
 
+  // Valida un celular argentino: 10 dígitos (característica + número),
+  // tolerando prefijos +54 / 54 / 0 y el 9 de móvil. Devuelve los 10 dígitos
+  // normalizados o null si no es válido.
+  const validarTelAR = (raw) => {
+    let d = (raw || "").replace(/\D/g, "");
+    if (d.startsWith("54")) d = d.slice(2); // código país
+    if (d.length === 11 && d.startsWith("9")) d = d.slice(1); // 9 de móvil
+    if (d.startsWith("0")) d = d.slice(1); // 0 de larga distancia
+    return d.length === 10 ? d : null;
+  };
+
   // Estado de la reserva en curso
   const state = {
     paso: 1,
@@ -222,6 +233,14 @@
     const btn = $("#booking-submit");
     const fd = new FormData(e.target);
 
+    const tel = validarTelAR(fd.get("telefono"));
+    if (!tel) {
+      err.textContent =
+        "Ingresá un celular argentino válido: 10 dígitos con característica (ej: 351 1234567).";
+      err.hidden = false;
+      return;
+    }
+
     btn.disabled = true;
     btn.textContent = "Reservando...";
     try {
@@ -234,7 +253,7 @@
           fecha: state.fecha,
           hora: state.hora,
           nombre: fd.get("nombre"),
-          telefono: fd.get("telefono"),
+          telefono: tel,
           email: fd.get("email"),
         }),
       });
