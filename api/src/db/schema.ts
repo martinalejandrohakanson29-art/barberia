@@ -93,6 +93,9 @@ export const barberos = pgTable("barberos", {
   nombre: text("nombre").notNull(),
   nivel: nivelEnum("nivel").notNull(),
   activo: boolean("activo").default(true).notNull(),
+  // Foto del profesional. Se guarda como data URL (imagen comprimida en el
+  // navegador), para no depender de almacenamiento externo.
+  fotoUrl: text("foto_url"),
   // Si el barbero también tiene login propio (para el panel), lo vinculamos.
   userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
 });

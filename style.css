@@ -1339,3 +1339,12 @@ a.footer__contact-item:hover { color: var(--gold); }
   .booking__dialog { max-height: 96vh; }
   .booking__body { padding: 1.25rem; }
 }
+
+/* Foto del barbero en las tarjetas de reserva */
+.booking__card-foto {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}

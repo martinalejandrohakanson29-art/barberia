@@ -13,7 +13,8 @@ import {
   turnos,
 } from "./db/schema.js";
 
-const app = Fastify({ logger: true });
+// bodyLimit alto: las fotos de profesionales viajan como data URL en el JSON.
+const app = Fastify({ logger: true, bodyLimit: 8 * 1024 * 1024 });
 
 const clientOrigin = process.env.CLIENT_ORIGIN ?? "http://localhost:8080";
 
@@ -322,11 +323,18 @@ app.get(
   "/api/admin/turnos",
   { preHandler: requireAdmin },
   async (request) => {
-    const { desde, hasta } = request.query as Record<string, string>;
+    const { desde, hasta, estado, barberoId } = request.query as Record<
+      string,
+      string
+    >;
     const ini = desde ? mkDate(desde, "00:00") : mkDate(fmtAR(new Date()).fecha, "00:00");
     const finRango = hasta
       ? new Date(mkDate(hasta, "00:00").getTime() + 24 * 60 * 60 * 1000)
       : new Date(ini.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    const condiciones = [gte(turnos.inicio, ini), lt(turnos.inicio, finRango)];
+    if (estado) condiciones.push(eq(turnos.estado, estado as typeof turnos.$inferSelect.estado));
+    if (barberoId) condiciones.push(eq(turnos.barberoId, Number(barberoId)));
 
     const filas = await db
       .select({
@@ -348,7 +356,7 @@ app.get(
       .from(turnos)
       .leftJoin(barberos, eq(turnos.barberoId, barberos.id))
       .leftJoin(servicios, eq(turnos.servicioId, servicios.id))
-      .where(and(gte(turnos.inicio, ini), lt(turnos.inicio, finRango)))
+      .where(and(...condiciones))
       .orderBy(asc(turnos.inicio));
 
     return filas.map((t) => ({
@@ -448,11 +456,18 @@ app.post(
   "/api/admin/barberos",
   { preHandler: requireAdmin },
   async (request, reply) => {
-    const { nombre, nivel } = (request.body ?? {}) as Record<string, string>;
+    const { nombre, nivel, fotoUrl } = (request.body ?? {}) as Record<
+      string,
+      string
+    >;
     if (!nombre || !nivel) return reply.status(400).send({ error: "Faltan datos" });
     const [creado] = await db
       .insert(barberos)
-      .values({ nombre: nombre.trim(), nivel: nivel as "premium" | "estandar" })
+      .values({
+        nombre: nombre.trim(),
+        nivel: nivel as "premium" | "estandar",
+        fotoUrl: fotoUrl || null,
+      })
       .returning();
     return reply.status(201).send(creado);
   }
@@ -463,7 +478,7 @@ app.patch(
   { preHandler: requireAdmin },
   async (request, reply) => {
     const id = Number((request.params as { id: string }).id);
-    const { nombre, nivel, activo } = (request.body ?? {}) as Record<
+    const { nombre, nivel, activo, fotoUrl } = (request.body ?? {}) as Record<
       string,
       unknown
     >;
@@ -471,6 +486,7 @@ app.patch(
     if (typeof nombre === "string") data.nombre = nombre.trim();
     if (nivel === "premium" || nivel === "estandar") data.nivel = nivel;
     if (typeof activo === "boolean") data.activo = activo;
+    if (fotoUrl !== undefined) data.fotoUrl = fotoUrl ? String(fotoUrl) : null;
     const [actualizado] = await db
       .update(barberos)
       .set(data)
@@ -507,6 +523,47 @@ app.get(
       .from(horarios)
       .where(eq(horarios.barberoId, id))
       .orderBy(asc(horarios.diaSemana));
+  }
+);
+
+// Reemplaza el horario semanal completo de un barbero.
+// body: { franjas: [{ diaSemana, horaInicio: "HH:MM", horaFin: "HH:MM" }, ...] }
+app.put(
+  "/api/admin/barberos/:id/horarios",
+  { preHandler: requireAdmin },
+  async (request, reply) => {
+    const id = Number((request.params as { id: string }).id);
+    const { franjas } = (request.body ?? {}) as {
+      franjas?: { diaSemana: number; horaInicio: string; horaFin: string }[];
+    };
+    if (!Array.isArray(franjas)) {
+      return reply.status(400).send({ error: "Falta el arreglo de franjas" });
+    }
+    // Validación básica: fin posterior al inicio y día 0..6.
+    for (const f of franjas) {
+      if (
+        f.diaSemana < 0 ||
+        f.diaSemana > 6 ||
+        !f.horaInicio ||
+        !f.horaFin ||
+        f.horaInicio >= f.horaFin
+      ) {
+        return reply.status(400).send({ error: "Franja inválida" });
+      }
+    }
+
+    await db.delete(horarios).where(eq(horarios.barberoId, id));
+    if (franjas.length) {
+      await db.insert(horarios).values(
+        franjas.map((f) => ({
+          barberoId: id,
+          diaSemana: f.diaSemana,
+          horaInicio: f.horaInicio,
+          horaFin: f.horaFin,
+        }))
+      );
+    }
+    return { ok: true, total: franjas.length };
   }
 );
 

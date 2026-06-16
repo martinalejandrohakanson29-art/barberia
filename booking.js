@@ -101,8 +101,11 @@
       const card = document.createElement("button");
       card.type = "button";
       card.className = "booking__card";
+      const avatar = b.fotoUrl
+        ? `<img class="booking__card-foto" src="${b.fotoUrl}" alt="">`
+        : `<span class="booking__card-initial">${b.nombre.charAt(0)}</span>`;
       card.innerHTML = `
-        <span class="booking__card-initial">${b.nombre.charAt(0)}</span>
+        ${avatar}
         <span class="booking__card-name">${b.nombre}</span>
         <span class="booking__card-tag">${nivelLabel[b.nivel] || b.nivel}</span>`;
       card.addEventListener("click", () => {
